@@ -78,8 +78,9 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
             false
         );
         _listedTokenIdCounter += 1;
-
-        IERC721(_nftContract).approve(address(this), _tokenId);
+        
+        IERC721(_nftContract).transferFrom(msg.sender, address(this), _tokenId); 
+        // IERC721(_nftContract).approve(address(this), _tokenId);
 
         emit MarketItemCreated (
             msg.sender,
@@ -88,7 +89,32 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
         );
     }
 
+    function createMarketSale(
+        address nftContract,
+        uint256 _itemId
+    ) public payable nonReentrant whenNotPaused {
+        uint price = _idToMarketItem[_itemId].price;
+        uint tokenId = _idToMarketItem[_itemId].tokenId;
+        require(
+            msg.value == price,
+            "Not enough balance to complete transaction"
+        );
 
+        idToVaultItem[_itemId].seller.transfer(msg.value);
+        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
+        idToVaultItem[_itemId].holder = payable(msg.sender);
+        idToVaultItem[_itemId].sold = true;
+        _itemsSold.increment();
+        payable(holder).transfer(listingFee);
+
+        emit MarketSale(
+            nftContract,
+            tokenId,
+            price,
+            idToVaultItem[_itemId].seller,
+            idToVaultItem[_itemId].holder
+        );
+    }
 
     function cancelMarketSale(uint256 _tokenId) public nonReentrant whenNotPaused {
         require(
