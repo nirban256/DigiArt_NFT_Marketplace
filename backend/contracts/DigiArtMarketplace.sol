@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.21;
 
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
@@ -15,7 +15,7 @@ import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
     way to find all the nfts owned by a user - using opensea api - https://docs.opensea.io/reference/api-overview
 */
 
-contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
+contract DigiArtMarketplace is ERC721, Ownable, ReentrancyGuard, Pausable {
     uint256 private _listedTokenIdCounter;
     uint256 private _soldTokenIdCounter;
 
@@ -36,19 +36,21 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
 
     mapping(uint256 => Item) private _idToMarketItem;
 
-    event MarketitemCreated(
+    event MarketItemCreated(
         address indexed sellerOfTokenId,
         address indexed buyerOfTokenId,
         uint256 indexed price
     );
 
-    event MarketitemSold(
+    event MarketItemSold(
         address indexed sellerOfTokenId,
         address indexed buyerOfTokenId,
         uint256 indexed price
     );
 
-    constructor(uint256 _listingFee) Ownable(msg.sender) {
+    constructor(
+        uint256 _listingFee
+    ) Ownable(msg.sender) ERC721("DigiArtMarketplace", "DAM") {
         require(msg.sender != address(0), "Invalid address");
         require(_listingFee > 0, "Listing fee must be greater than 0");
         admin = payable(msg.sender);
@@ -61,11 +63,12 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
     ) public payable nonReentrant whenNotPaused {
         require(_price > 0 ether, "Price must be greater than 0 ether");
         require(
-            IERC721(_nftContract).ownerOf(_tokenId) == msg.sender || IERC721(_nftContract).getApproved(_tokenId) == msg.sender,
+            ERC721(_nftContract).ownerOf(_tokenId) == msg.sender ||
+                ERC721(_nftContract).getApproved(_tokenId) == msg.sender,
             "You are not the owner of this token"
         );
 
-        uint256 private _id = _listedTokenIdCounter;
+        uint256 _id = _listedTokenIdCounter;
 
         _idToMarketItem[_tokenId] = Item(
             _id,
@@ -78,15 +81,15 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
             false
         );
         _listedTokenIdCounter += 1;
-        
-        IERC721(_nftContract).transferFrom(msg.sender, address(this), _tokenId); 
+
+        ERC721(_nftContract).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _tokenId
+        );
         // IERC721(_nftContract).approve(address(this), _tokenId);
 
-        emit MarketItemCreated (
-            msg.sender,
-            address(0),
-            _price
-        );
+        emit MarketItemCreated(msg.sender, address(0), _price);
     }
 
     function createMarketSale(
@@ -99,24 +102,43 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
             msg.value == price,
             "Not enough balance to complete transaction"
         );
+        require(
+            _idToMarketItem[_itemId].sellerOfTokenId != msg.sender,
+            "You cannot buy your own token"
+        );
+        require(_idToMarketItem[_itemId].sold == true, "Token already sold");
+        require(_idToMarketItem[_itemId].tokenId >= 0, "Token not listed");
 
-        idToVaultItem[_itemId].seller.transfer(msg.value);
-        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
-        idToVaultItem[_itemId].holder = payable(msg.sender);
-        idToVaultItem[_itemId].sold = true;
-        _itemsSold.increment();
-        payable(holder).transfer(listingFee);
+        _idToMarketItem[_itemId].buyerOfTokenId = payable(msg.sender);
+        _idToMarketItem[_itemId].ownerOfTokenId = payable(msg.sender);
+        _idToMarketItem[_itemId].sold = true;
 
-        emit MarketSale(
-            nftContract,
-            tokenId,
-            price,
-            idToVaultItem[_itemId].seller,
-            idToVaultItem[_itemId].holder
+        _soldTokenIdCounter += 1;
+
+        (bool success, ) = address(this).call{value: price}("");
+        require(success, "Transfer failed while buying token");
+
+        ERC721(nftContract).safeTransferFrom(
+            address(this),
+            msg.sender,
+            tokenId
+        );
+
+        (success, ) = _idToMarketItem[_itemId].sellerOfTokenId.call{
+            value: price
+        }("");
+        require(success, "Transfer failed while sending money to seller");
+
+        emit MarketItemSold(
+            _idToMarketItem[_itemId].sellerOfTokenId,
+            _idToMarketItem[_itemId].buyerOfTokenId,
+            _idToMarketItem[_itemId].price
         );
     }
 
-    function cancelMarketSale(uint256 _tokenId) public nonReentrant whenNotPaused {
+    function cancelMarketSale(
+        uint256 _tokenId
+    ) public nonReentrant whenNotPaused {
         require(
             _idToMarketItem[_tokenId].sellerOfTokenId == msg.sender ||
                 _idToMarketItem[_tokenId].ownerOfTokenId == msg.sender,
@@ -124,7 +146,7 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
         );
         require(_idToMarketItem[_tokenId].sold == true, "Token already sold");
 
-        IERC721(_idToMarketItem[_tokenId].nftContract).safeTransferFrom(
+        ERC721(_idToMarketItem[_tokenId].nftContract).safeTransferFrom(
             address(this),
             msg.sender,
             _tokenId
@@ -158,6 +180,10 @@ contract DigiArtMarketplace is IERC721, Ownable, ReentrancyGuard, Pausable {
     }
 
     fallback() external payable {
+        revert("Invalid function called");
+    }
+
+    receive() external payable {
         revert("Invalid function called");
     }
 }
