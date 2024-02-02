@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
@@ -16,7 +16,7 @@ import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 */
 
 contract DigiArtMarketplace is ERC721, Ownable, ReentrancyGuard, Pausable {
-    ERC721 nft;
+    IERC721 nft;
 
     uint256 private _listedTokenIdCounter;
     uint256 private _soldTokenIdCounter;
