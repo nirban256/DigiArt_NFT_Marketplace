@@ -6,7 +6,7 @@ import Collections from './components/Collections';
 
 const App = () => {
   return (
-    <div className='bg-[#2b2b2b]'>
+    <div className='base-design bg-[#413eea]'>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
