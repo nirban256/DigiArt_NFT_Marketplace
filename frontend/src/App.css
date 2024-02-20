@@ -1,5 +1,4 @@
-.base-design {
-    position: relative;
+.dark-mode {
     width: 100vmax;
     height: 100vh;
     background: radial-gradient(93.53% 261.49% at 100.87% -4.93%, #0B1120 0%, #0B1120 0%, #0B1120 31.92%, rgba(34, 31, 56, 0.9) 49%, #0B263B 71.89%, #0B1120 100%);
@@ -7,7 +6,18 @@
     color: white;
 }
 
+.light-mode {
+    width: 100vmax;
+    height: 100vh;
+    background: linear-gradient(250.8deg, #FFFFFF 0.3%, #CFF6FF 0.3%, #93E3F4 19.18%, #CAF4FD 46.9%, #99EAFC 84.06%, #FFFFFF 103.66%);
+    backdrop-filter: blur(20px);
+    color: rgb(255, 0, 0);
+}
+
 .logo {
-    max-width: 150px;
-    max-height: 200px;
+    width: 150px;
+    height: 100px;
+    padding: 20px;
+    display: inline-block;
+    border-radius: 25%;
 }
