@@ -6,6 +6,7 @@ import {
   coinbaseWallet,
   walletConnect,
 } from "@thirdweb-dev/react";
+import { ArbitrumSepolia } from "@thirdweb-dev/chains";
 import './App.css';
 import Header from './components/Header';
 import Home from './components/Home';
@@ -27,7 +28,7 @@ const App = () => {
 
   return (
     <ThirdwebProvider
-      activeChain="mumbai"
+      activeChain={ArbitrumSepolia}
       clientId={process.env.REACT_APP_THIRDWEB_CLIENT_ID}
       supportedWallets={[
         metamaskWallet({ recommended: true }),
