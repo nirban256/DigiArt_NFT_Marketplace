@@ -9,9 +9,9 @@
 .light-mode {
     width: 100vmax;
     height: 100vh;
-    background: linear-gradient(250.8deg, #FFFFFF 0.3%, #CFF6FF 0.3%, #93E3F4 19.18%, #CAF4FD 46.9%, #99EAFC 84.06%, #FFFFFF 103.66%);
+    /* background: linear-gradient(250.8deg, #FFFFFF 0.3%, #CFF6FF 0.3%, #93E3F4 19.18%, #CAF4FD 46.9%, #99EAFC 84.06%, #FFFFFF 103.66%);
     backdrop-filter: blur(20px);
-    color: rgb(255, 0, 0);
+    color: rgb(255, 0, 0); */
 }
 
 .logo {

@@ -1,21 +1,16 @@
 const hre = require("hardhat");
 
 const main = async () => {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const listingFee = ethers.parseEther("0.01");
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  const marketplace = await ethers.deployContract("DigiArtMarketplace", [listingFee]);
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
+  await marketplace.waitForDeployment();
 
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `Marketplace with listing fee of ${ethers.formatEther(
+      listingFee
+    )} ETH deployed to ${marketplace.target}`
   );
 }
 
@@ -23,3 +18,7 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+
+// Hardhat address - 0x5FbDB2315678afecb367f032d93F642f64180aa3
+// Arbitrum Sepolia address - 0x4ACF94F3961D9B021920338DD593f19956e7abbA

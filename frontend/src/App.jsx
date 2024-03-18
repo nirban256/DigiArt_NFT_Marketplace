@@ -11,9 +11,10 @@ import './App.css';
 import Header from './components/Header';
 import Home from './components/Home';
 import Collections from './components/Collections';
+import ListNFT from './components/ListNFT';
 
 const App = () => {
-  const [mode, setMode] = useState('dark-mode');
+  const [mode, setMode] = useState('light-mode');
   const toggleTheme = () => {
     if (mode === 'dark-mode') {
       setMode('light-mode');
@@ -35,11 +36,12 @@ const App = () => {
         coinbaseWallet(),
         walletConnect(),
       ]}>
-      <div className={`App ${mode}`}>
+      <div className={`${mode} overflow-x-hidden`}>
         <Header toggleTheme={toggleTheme} mode={mode} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} mode={mode} />
           <Route path="/collection" element={<Collections />} />
+          <Route path="/listnft" element={<ListNFT />} />
         </Routes>
       </div>
     </ThirdwebProvider>

@@ -2,17 +2,21 @@ import React from 'react';
 import Image from './Image';
 import heroImage from "../images/heroImage.jpg";
 
-const Home = () => {
+const Home = ({ mode }) => {
     return (
-        <div className='p-5'>
-            <main>
+        <div>
+            <main className=' flex overflow-x-hidden'>
                 <div>
-                    <h1 className='text-5xl font-semibold'>Discover digital art & collect NFTs</h1>
+                    <h1 className='text-6xl font-semibold'>Discover digital art & collect NFTs</h1>
                     <p>
                         NFT Marketplace is the premier platform for discovering, collecting, and selling digital art & collectibles. Buy and sell art with confidence.
                     </p>
-                    <button type="submit">
-                        Get started
+                    <button>
+                        Buy Artwork
+                    </button>
+
+                    <button>
+                        Sell Artwork
                     </button>
 
                     <div>
@@ -27,10 +31,21 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div>
+                <div className=' w-1/2'>
                     <Image heroImage={heroImage} hero={"hero"} title={"House of Horror"} creator={"John Doe"} />
                 </div>
             </main>
+
+            <div>
+                <h2 className='text-5xl font-semibold'>
+                    Browse Collections
+                </h2>
+                <div className='flex overflow-x-hidden'>
+                    <Image heroImage={heroImage} hero={"hero"} title={"House of Horror"} creator={"John Doe"} />
+                    <Image heroImage={heroImage} hero={"hero"} title={"House of Horror"} creator={"John Doe"} />
+                    <Image heroImage={heroImage} hero={"hero"} title={"House of Horror"} creator={"John Doe"} />
+                </div>
+            </div>
         </div>
     )
 }
