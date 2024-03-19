@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { abi } from "../abi/MarketplaceAbi";
+import { abi, contractAddress } from "../abi/MarketplaceAbi";
 import { Web3Button } from '@thirdweb-dev/react';
 import { ethers } from 'ethers';
 
 const ListNFT = () => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState(0);
+    // const [file, setFile] = useState();
     const [date, setDate] = useState('');
 
     const handleName = (e) => {
@@ -18,6 +19,12 @@ const ListNFT = () => {
         const value = ethers.utils.parseEther(e.target.value, 'ether');
         setPrice(value);
     }
+
+    // const handleFile = (e) => {
+    //     e.preventDefault();
+    //     console.log(e.target.files);
+    //     setFile(URL.createObjectURL(e.target.files[0]));
+    // }
 
     const handleDate = (e) => {
         e.preventDefault();
@@ -48,12 +55,17 @@ const ListNFT = () => {
                     <input type="number" onChange={handlePrice} />
                 </div>
 
+                {/* <div className="img">
+                    <label>Enter the image to mint: </label>
+                    <input type="file" onChange={handleFile} />
+                </div> */}
+
                 <div className="date">
                     <label>Enter last date to offer for the product: </label>
                     <input type="date" onChange={handleDate} />
                 </div>
 
-                <Web3Button contractAbi={abi} action={async (contract) => contract.call("auctionListing", [price, date, name])} >
+                <Web3Button contractAddress={contractAddress} contractAbi={abi} action={async (contract) => contract.call("listNFTForMarketSale", [price, date, name])} >
                     List Item
                 </Web3Button>
             </div>

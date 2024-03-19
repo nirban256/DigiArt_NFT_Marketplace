@@ -1,3 +1,5 @@
+export const contractAddress = "0x4ACF94F3961D9B021920338DD593f19956e7abbA";
+
 export const abi = [
     {
         "type": "constructor",
